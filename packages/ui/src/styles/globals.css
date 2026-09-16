@@ -1,0 +1,134 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@source "../";
+@source "../../../auth/src";
+@source "../../../apps";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.5rem;
+
+  /* HavenGate theme contract */
+  --hg-primary: #112b46;
+  --hg-text: #243b53;
+  --hg-success: #0f7a6c;
+  --hg-danger: #b42318;
+  --hg-warning: #c77900;
+  --hg-border: #d9e2ec;
+  --hg-surface: #ffffff;
+
+  /* Derived neutrals */
+  --hg-canvas: #f7f9fb;
+  --hg-muted: #f0f4f8;
+  --hg-muted-foreground: #627d98;
+  --hg-selected: #eef3f8;
+  --hg-disabled: #bcccdc;
+
+  /* Auth surface tokens */
+  --hg-auth-bg: #080b0f;
+  --hg-auth-panel: #111820;
+  --hg-auth-input: #161d26;
+  --hg-auth-text: #f8fafc;
+  --hg-auth-muted: #94a3b8;
+  --hg-auth-accent: #08d6b2;
+  --hg-auth-accent-hover: #2ce8c7;
+  --hg-auth-accent-soft: rgba(8, 214, 178, 0.12);
+  --hg-auth-border: rgba(255, 255, 255, 0.1);
+  --hg-auth-glow: 0 0 16px rgba(8, 214, 178, 0.27);
+  --hg-auth-card-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+
+  --background: var(--hg-canvas);
+  --foreground: var(--hg-text);
+  --surface: var(--hg-surface);
+  --card: var(--hg-surface);
+  --card-foreground: var(--hg-text);
+  --popover: var(--hg-surface);
+  --popover-foreground: var(--hg-text);
+  --primary: var(--hg-primary);
+  --primary-foreground: #ffffff;
+  --secondary: var(--hg-muted);
+  --secondary-foreground: var(--hg-primary);
+  --muted: var(--hg-muted);
+  --muted-foreground: var(--hg-muted-foreground);
+  --accent: var(--hg-selected);
+  --accent-foreground: var(--hg-primary);
+  --destructive: var(--hg-danger);
+  --destructive-foreground: #ffffff;
+  --success: var(--hg-success);
+  --success-foreground: #ffffff;
+  --warning: var(--hg-warning);
+  --warning-foreground: #ffffff;
+  --disabled: var(--hg-disabled);
+  --disabled-foreground: var(--hg-muted-foreground);
+  --border: var(--hg-border);
+  --input: var(--hg-border);
+  --ring: var(--hg-primary);
+  --sidebar: var(--hg-primary);
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: var(--hg-primary);
+  --sidebar-accent: color-mix(in oklab, #ffffff 10%, transparent);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: color-mix(in oklab, #ffffff 15%, transparent);
+  --sidebar-ring: #ffffff;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-disabled: var(--disabled);
+  --color-disabled-foreground: var(--disabled-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-auth-bg: var(--hg-auth-bg);
+  --color-auth-panel: var(--hg-auth-panel);
+  --color-auth-input: var(--hg-auth-input);
+  --color-auth-text: var(--hg-auth-text);
+  --color-auth-muted: var(--hg-auth-muted);
+  --color-auth-accent: var(--hg-auth-accent);
+  --color-auth-accent-hover: var(--hg-auth-accent-hover);
+  --color-auth-border: var(--hg-auth-border);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}

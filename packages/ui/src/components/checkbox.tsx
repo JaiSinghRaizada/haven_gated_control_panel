@@ -1,0 +1,27 @@
+import * as React from 'react'
+import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
+import { CheckIcon } from 'lucide-react'
+
+import { cn } from '@havengate/ui/lib/utils'
+
+function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+  return (
+    <CheckboxPrimitive.Root
+      data-slot="checkbox"
+      className={cn(
+        'peer flex size-5 shrink-0 items-center justify-center rounded-[4px] border-2 border-success bg-surface transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-success/30 disabled:cursor-not-allowed disabled:border-disabled disabled:bg-muted data-[state=checked]:text-success aria-invalid:border-destructive',
+        className,
+      )}
+      {...props}
+    >
+      <CheckboxPrimitive.Indicator
+        data-slot="checkbox-indicator"
+        className="flex items-center justify-center text-current"
+      >
+        <CheckIcon className="size-3.5" strokeWidth={3} />
+      </CheckboxPrimitive.Indicator>
+    </CheckboxPrimitive.Root>
+  )
+}
+
+export { Checkbox }

@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./apps/control-panel" },
+    { "path": "./apps/org-panel" },
+    { "path": "./packages/types" },
+    { "path": "./packages/utils" },
+    { "path": "./packages/api" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/auth" }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@havengate/auth",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@havengate/api": "*",
+    "@havengate/types": "*",
+    "@havengate/ui": "*",
+    "lucide-react": "^0.540.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { getErrorMessage } from '@havengate/api'
 import { Building2, Info, LayoutGrid, Search, ShieldCheck, Users } from 'lucide-react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
-import { Button, Input, toast } from '@havengate/ui'
+import { Button, Input } from '@havengate/ui'
 
 import { listOrganisationsRequest, type OrganisationPage, type OrganisationStatus } from '../../api/organizations'
 import { ROUTES } from '../../routes'
+import { StatusBadge } from './shared/status-badge'
 
 const PAGE_SIZE = 10
 
@@ -15,11 +16,6 @@ const STATUS_FILTERS: { key: 'all' | OrganisationStatus; label: string }[] = [
   { key: 'ACTIVE', label: 'Active' },
   { key: 'SUSPENDED', label: 'Suspended' },
 ]
-
-const STATUS_STYLES: Record<OrganisationStatus, { label: string; dot: string; bg: string; border: string; text: string }> = {
-  ACTIVE: { label: 'Active', dot: 'bg-primary', bg: 'bg-primary/[0.08]', border: 'border-primary/30', text: 'text-primary' },
-  SUSPENDED: { label: 'Suspended', dot: 'bg-destructive', bg: 'bg-destructive/[0.13]', border: 'border-destructive/20', text: 'text-destructive' },
-}
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
@@ -45,17 +41,8 @@ function StatTile({ label, value, trend, trendLabel, icon: Icon }: { label: stri
   )
 }
 
-function StatusBadge({ status }: { status: OrganisationStatus }) {
-  const style = STATUS_STYLES[status]
-  return (
-    <div className={`flex w-fit items-center gap-1.5 rounded-md border px-2.5 py-1 ${style.bg} ${style.border}`}>
-      <span className={`size-1.5 rounded-full ${style.dot}`} />
-      <p className={`font-mono text-[11px] font-semibold ${style.text}`}>{style.label}</p>
-    </div>
-  )
-}
-
 function OrganizationsDashboard() {
+  const navigate = useNavigate()
   const [page, setPage] = React.useState(1)
   const [data, setData] = React.useState<OrganisationPage | null>(null)
   const [loading, setLoading] = React.useState(true)
@@ -171,7 +158,7 @@ function OrganizationsDashboard() {
                 <div className="flex w-[120px] justify-end">
                   <button
                     type="button"
-                    onClick={() => toast(`Managing ${org.name} is coming soon`)}
+                    onClick={() => navigate(ROUTES.organizationDetail(org.id))}
                     className="rounded-lg border border-border bg-muted px-3 py-2 text-[13px] font-semibold text-foreground"
                   >
                     Manage

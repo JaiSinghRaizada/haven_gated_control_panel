@@ -1,4 +1,4 @@
-import type { Organisation, OrganisationPortfolioType } from './types.ts'
+import type { Organisation, OrganisationPortfolioType, OrganisationStatus } from './types.ts'
 
 export interface OnboardOrganisationOwnerRequest {
   fullName: string
@@ -6,7 +6,8 @@ export interface OnboardOrganisationOwnerRequest {
   phone?: string
 }
 
-export interface OnboardOrganisationSecurityRequest {
+/** Shared by onboarding and later profile edits — the backend's security DTO is the same shape either way. */
+export interface OrganisationSecurityPatch {
   mfaRequired?: boolean
   restrictToCompanyDomain?: boolean
   auditLoggingEnabled?: boolean
@@ -23,7 +24,21 @@ export interface OnboardOrganisationRequest {
   defaultLanguage?: string
   defaultCurrency?: string
   owner: OnboardOrganisationOwnerRequest
-  security?: OnboardOrganisationSecurityRequest
+  security?: OrganisationSecurityPatch
+}
+
+/** Every profile field is editable; the slug is fixed once an organisation is created. */
+export interface UpdateOrganisationRequest {
+  name?: string
+  registrationNumber?: string
+  hqCountry?: string
+  primaryTimezone?: string
+  headOfficeAddress?: string
+  portfolioType?: OrganisationPortfolioType
+  defaultLanguage?: string
+  defaultCurrency?: string
+  security?: OrganisationSecurityPatch
+  status?: OrganisationStatus
 }
 
 export interface OnboardOrganisationMembership {

@@ -13,9 +13,9 @@ export interface AuthTokens {
 export interface AuthUser {
   id: string
   email: string
-  phone: string
+  phone: string | null
   fullName: string
-  avatarUrl: string
+  avatarUrl: string | null
   isSuperAdmin: boolean
   isActive: boolean
   hasPassword: boolean
@@ -32,4 +32,18 @@ export interface AuthState {
   status: AuthStatus
   user: AuthUser | null
   error: string | null
+  isAuthenticating: boolean
+}
+
+export interface AuthBranding {
+  appLabel: string
+  tagline: string
+  heroImageSrc: string
+  heroImageAlt: string
+  heroTitle: string
+  heroDescription: string
+  heroTags: string[]
+  loginBadge: string
+  loginTitle: string
+  loginDescription: string
 }

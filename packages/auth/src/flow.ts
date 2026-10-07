@@ -1,4 +1,4 @@
-export type AuthScreen = 'login' | 'forgot' | 'sent' | 'verify' | 'reset' | 'success' | 'mfa'
+export type AuthScreen = 'login' | 'forgot' | 'sent' | 'reset' | 'mfa'
 
 export interface AuthFlowState {
   screen: AuthScreen
@@ -6,6 +6,7 @@ export interface AuthFlowState {
   code: string
   newPassword: string
   confirmPassword: string
+  resetToken: string
 }
 
 export type AuthFlowAction =
@@ -21,6 +22,11 @@ export const initialAuthFlowState: AuthFlowState = {
   code: '',
   newPassword: '',
   confirmPassword: '',
+  resetToken: '',
+}
+
+export function createAuthFlowState(overrides: Partial<AuthFlowState> = {}): AuthFlowState {
+  return { ...initialAuthFlowState, ...overrides }
 }
 
 export function authFlowReducer(state: AuthFlowState, action: AuthFlowAction): AuthFlowState {

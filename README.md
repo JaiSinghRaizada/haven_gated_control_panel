@@ -10,6 +10,7 @@ apps/
   org-panel/       # @havengate/org-panel      (dev: http://localhost:5174)
 packages/
   api/             # @havengate/api    – fetch-based API client (createApiClient)
+  auth/            # @havengate/auth   – shared auth service, provider, guards & login screens
   types/           # @havengate/types  – shared data models / DTOs
   ui/              # @havengate/ui     – Tailwind v4 theme + shadcn/ui components
   utils/           # @havengate/utils  – shared helpers & constants

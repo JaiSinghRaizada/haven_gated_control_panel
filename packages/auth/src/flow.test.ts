@@ -14,9 +14,9 @@ describe('authFlowReducer', () => {
 
   it('changes screens through explicit actions', () => {
     const forgot = authFlowReducer(initialAuthFlowState, { type: 'screen', screen: 'forgot' })
-    const verify = authFlowReducer(forgot, { type: 'screen', screen: 'verify' })
+    const sent = authFlowReducer(forgot, { type: 'screen', screen: 'sent' })
 
     expect(forgot.screen).toBe('forgot')
-    expect(verify.screen).toBe('verify')
+    expect(sent.screen).toBe('sent')
   })
 })

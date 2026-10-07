@@ -1,9 +1,23 @@
-import { AuthProvider, AdminAuthFlow, createAuthService, GuestOnly, RequireAuth, useAuth } from '@havengate/auth'
+import { AuthProvider, AdminAuthFlow, createAuthService, GuestOnly, RequireAuth, useAuth, type AuthBranding } from '@havengate/auth'
 
-import { api, refreshTokenStorage, tokenStorage } from './lib/api'
+import { api, refreshTokenStorage, registerRefreshHandler, tokenStorage } from './lib/api'
 import { ControlDashboard } from './components/control-dashboard'
 
 const authService = createAuthService({ api, tokenStorage, refreshTokenStorage })
+registerRefreshHandler(() => authService.refresh())
+
+const branding: AuthBranding = {
+  appLabel: 'HavenGate Control',
+  tagline: 'Luxury Living',
+  heroImageSrc: '/havengate-tower.png',
+  heroImageAlt: 'HavenGate Tower at night',
+  heroTitle: 'Secure access, without compromise',
+  heroDescription: 'Identity protection engineered for the people who operate HavenGate Tower.',
+  heroTags: ['ENCRYPTED', '24/7 MONITORED'],
+  loginBadge: 'COMMAND CENTER',
+  loginTitle: 'Command Center',
+  loginDescription: 'Real-time intelligence and telemetry of HavenGate Tower',
+}
 
 function App() {
   return (
@@ -17,9 +31,9 @@ function ControlPanelContent() {
   const { status, user, logout } = useAuth()
   if (status === 'loading') return <SessionLoading />
   if (status === 'authenticated') {
-    return <RequireAuth fallback={<AdminAuthFlow />}><ControlDashboard userName={user?.fullName} userEmail={user?.email} onLogout={logout} /></RequireAuth>
+    return <RequireAuth fallback={<AdminAuthFlow branding={branding} />}><ControlDashboard userName={user?.fullName} userEmail={user?.email} isSuperAdmin={user?.isSuperAdmin} onLogout={logout} /></RequireAuth>
   }
-  return <GuestOnly fallback={<SessionLoading />}><AdminAuthFlow /></GuestOnly>
+  return <GuestOnly fallback={<SessionLoading />}><AdminAuthFlow branding={branding} /></GuestOnly>
 }
 
 function SessionLoading() {

@@ -1,6 +1,14 @@
 import { isApiRequestError, type ApiClient, type TokenStorage } from '@havengate/api'
 
-import { forgotPasswordRequest, loginRequest, logoutRequest, meRequest, refreshRequest } from './endpoints.ts'
+import {
+  forgotPasswordRequest,
+  loginRequest,
+  logoutAllRequest,
+  logoutRequest,
+  meRequest,
+  refreshRequest,
+  setPasswordRequest,
+} from './endpoints.ts'
 import type { AuthSession, AuthUser, LoginCredentials } from './types.ts'
 
 export interface AuthServiceOptions {
@@ -12,8 +20,10 @@ export interface AuthServiceOptions {
 export interface AuthService {
   hasSession(): boolean
   login(credentials: LoginCredentials): Promise<AuthSession>
+  setPassword(token: string, password: string): Promise<AuthSession>
   forgotPassword(email: string): Promise<void>
   logout(): Promise<void>
+  logoutAll(): Promise<void>
   me(): Promise<AuthUser>
   refresh(): Promise<string | null>
 }
@@ -25,6 +35,12 @@ export function createAuthService({ api, tokenStorage, refreshTokenStorage }: Au
     },
     async login(credentials) {
       const session = await loginRequest(api, credentials)
+      tokenStorage.set(session.tokens.accessToken)
+      refreshTokenStorage.set(session.tokens.refreshToken)
+      return session
+    },
+    async setPassword(token, password) {
+      const session = await setPasswordRequest(api, { token, password })
       tokenStorage.set(session.tokens.accessToken)
       refreshTokenStorage.set(session.tokens.refreshToken)
       return session
@@ -41,6 +57,14 @@ export function createAuthService({ api, tokenStorage, refreshTokenStorage }: Au
       }
       try {
         await logoutRequest(api, { refreshToken })
+      } finally {
+        tokenStorage.clear()
+        refreshTokenStorage.clear()
+      }
+    },
+    async logoutAll() {
+      try {
+        await logoutAllRequest(api)
       } finally {
         tokenStorage.clear()
         refreshTokenStorage.clear()

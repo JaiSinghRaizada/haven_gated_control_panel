@@ -3,7 +3,7 @@ import { Check, Eye, EyeOff, LockKeyhole, MailCheck, ShieldCheck } from 'lucide-
 
 import { Button, Input } from '@havengate/ui'
 
-const towerImage = '/havengate-tower.png'
+import type { AuthBranding } from '../types.ts'
 
 function SecurityNote() {
   return (
@@ -14,26 +14,24 @@ function SecurityNote() {
   )
 }
 
-function HeroPanel() {
+function HeroPanel({ branding }: { branding: AuthBranding }) {
   return (
     <section className="relative hidden min-h-svh w-1/2 flex-col justify-between overflow-hidden border-r border-white/10 p-16 xl:flex">
-      <img src={towerImage} alt="HavenGate Tower at night" className="absolute inset-0 size-full object-cover" />
+      <img src={branding.heroImageSrc} alt={branding.heroImageAlt} className="absolute inset-0 size-full object-cover" />
       <div className="absolute inset-0 bg-auth-bg/75" />
       <div className="relative flex items-center gap-3">
         <div className="flex size-10 items-center justify-center rounded-[10px] bg-auth-accent text-[22px] font-extrabold text-auth-bg shadow-[var(--hg-auth-glow)]">H</div>
         <div className="flex flex-col gap-0.5">
           <span className="text-lg font-bold">HAVENGATE</span>
-          <span className="font-mono text-[10px] font-semibold uppercase text-auth-accent">Luxury Living</span>
+          <span className="font-mono text-[10px] font-semibold uppercase text-auth-accent">{branding.tagline}</span>
         </div>
       </div>
       <div className="relative flex flex-col gap-5">
-        <h2 className="text-[40px] font-extrabold leading-tight">Secure access, without compromise</h2>
-        <p className="max-w-[500px] text-sm leading-[1.5] text-slate-400">
-          Identity protection engineered for the people who operate HavenGate Tower.
-        </p>
+        <h2 className="text-[40px] font-extrabold leading-tight">{branding.heroTitle}</h2>
+        <p className="max-w-[500px] text-sm leading-[1.5] text-slate-400">{branding.heroDescription}</p>
       </div>
       <div className="relative flex gap-4">
-        {['ENCRYPTED', '24/7 MONITORED'].map((label) => (
+        {branding.heroTags.map((label) => (
           <span key={label} className="flex items-center gap-1.5 rounded-md bg-auth-accent/[0.12] px-2.5 py-1.5 font-mono text-[10px] font-semibold text-auth-accent">
             <span className="size-1.5 rounded-full bg-auth-accent" />
             {label}
@@ -124,7 +122,7 @@ function Confirmation({ icon, title, description, action, onAction }: { icon: 'm
   )
 }
 
-function AuthShell({ children }: { children: React.ReactNode }) {
+function AuthShell({ branding, children }: { branding: AuthBranding; children: React.ReactNode }) {
   const contentRef = React.useRef<HTMLElement>(null)
 
   React.useEffect(() => {
@@ -133,7 +131,7 @@ function AuthShell({ children }: { children: React.ReactNode }) {
 
   return (
     <main className="flex min-h-svh w-full items-stretch overflow-hidden bg-auth-bg text-auth-text">
-      <HeroPanel />
+      <HeroPanel branding={branding} />
       <section ref={contentRef} tabIndex={-1} aria-live="polite" className="relative flex min-h-svh w-full items-center justify-center overflow-hidden px-6 py-10 outline-none focus-visible:ring-2 focus-visible:ring-auth-accent/50 xl:w-1/2">
         <div className="pointer-events-none absolute right-[-100px] top-20 size-[380px] rounded-full bg-auth-accent/10 blur-[100px]" />
         <div className="pointer-events-none absolute bottom-[-100px] left-[-100px] size-[350px] rounded-full bg-indigo-500/10 blur-[100px]" />

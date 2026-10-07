@@ -21,10 +21,11 @@ const user: AuthUser = {
 function setup() {
   const post = vi.fn()
   const get = vi.fn()
+  const protectedPost = vi.fn()
   const tokenStorage = { get: vi.fn<() => string | null>(() => null), set: vi.fn(), clear: vi.fn() }
   const refreshTokenStorage = { get: vi.fn<() => string | null>(() => null), set: vi.fn(), clear: vi.fn() }
-  const api = { public: { post }, protected: { get } } as never
-  return { service: createAuthService({ api, tokenStorage, refreshTokenStorage }), post, get, tokenStorage, refreshTokenStorage }
+  const api = { public: { post }, protected: { get, post: protectedPost } } as never
+  return { service: createAuthService({ api, tokenStorage, refreshTokenStorage }), post, get, protectedPost, tokenStorage, refreshTokenStorage }
 }
 
 describe('createAuthService.login', () => {
@@ -65,6 +66,34 @@ describe('createAuthService.login', () => {
   })
 })
 
+describe('createAuthService.setPassword', () => {
+  it('posts the reset token and new password, then stores the returned session', async () => {
+    const { service, post, tokenStorage, refreshTokenStorage } = setup()
+    post.mockResolvedValue({ accessToken: 'access-123', refreshToken: 'refresh-456', user })
+
+    await expect(service.setPassword('reset-token-abc', 'NewStrongPass456')).resolves.toEqual({
+      user,
+      tokens: { accessToken: 'access-123', refreshToken: 'refresh-456' },
+    })
+    expect(post).toHaveBeenCalledWith('/api/auth/set-password', {
+      token: 'reset-token-abc',
+      password: 'NewStrongPass456',
+    })
+    expect(tokenStorage.set).toHaveBeenCalledWith('access-123')
+    expect(refreshTokenStorage.set).toHaveBeenCalledWith('refresh-456')
+  })
+
+  it('preserves invalid or expired token errors', async () => {
+    const { service, post } = setup()
+    post.mockRejectedValue(new ApiRequestError({ kind: 'unauthorized', status: 401, message: 'Invalid or expired token' }))
+
+    await expect(service.setPassword('stale-token', 'NewStrongPass456')).rejects.toMatchObject({
+      status: 401,
+      message: 'Invalid or expired token',
+    })
+  })
+})
+
 describe('createAuthService.logout', () => {
   it('posts the refresh token and clears both cached tokens after 204', async () => {
     const { service, post, tokenStorage, refreshTokenStorage } = setup()
@@ -73,6 +102,27 @@ describe('createAuthService.logout', () => {
 
     await expect(service.logout()).resolves.toBeUndefined()
     expect(post).toHaveBeenCalledWith('/api/auth/logout', { refreshToken: 'refresh-456' })
+    expect(tokenStorage.clear).toHaveBeenCalledTimes(1)
+    expect(refreshTokenStorage.clear).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('createAuthService.logoutAll', () => {
+  it('revokes all sessions and clears both cached tokens after 204', async () => {
+    const { service, protectedPost, tokenStorage, refreshTokenStorage } = setup()
+    protectedPost.mockResolvedValue(undefined)
+
+    await expect(service.logoutAll()).resolves.toBeUndefined()
+    expect(protectedPost).toHaveBeenCalledWith('/api/auth/logout-all')
+    expect(tokenStorage.clear).toHaveBeenCalledTimes(1)
+    expect(refreshTokenStorage.clear).toHaveBeenCalledTimes(1)
+  })
+
+  it('still clears cached tokens if the request fails', async () => {
+    const { service, protectedPost, tokenStorage, refreshTokenStorage } = setup()
+    protectedPost.mockRejectedValue(new ApiRequestError({ kind: 'unauthorized', status: 401, message: 'Unauthorized' }))
+
+    await expect(service.logoutAll()).rejects.toMatchObject({ status: 401 })
     expect(tokenStorage.clear).toHaveBeenCalledTimes(1)
     expect(refreshTokenStorage.clear).toHaveBeenCalledTimes(1)
   })
@@ -118,7 +168,7 @@ describe('createAuthService.me', () => {
 
     expect(service.hasSession()).toBe(true)
     await expect(service.me()).resolves.toEqual(user)
-    expect(get).toHaveBeenCalledWith('/api/auth/me')
+    expect(get).toHaveBeenCalledWith('/api/users/me')
   })
 
   it('reports no cached session when the token is absent', () => {

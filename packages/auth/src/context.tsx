@@ -6,8 +6,10 @@ import type { AuthState, LoginCredentials } from './types.ts'
 
 export interface AuthContextValue extends AuthState {
   login(credentials: LoginCredentials): Promise<void>
+  setPassword(token: string, password: string): Promise<void>
   forgotPassword(email: string): Promise<void>
   logout(): Promise<void>
+  logoutAll(): Promise<void>
 }
 
 const AuthContext = React.createContext<AuthContextValue | null>(null)
@@ -22,6 +24,7 @@ function AuthProvider({ service, children }: AuthProviderProps) {
     status: service.hasSession() ? 'loading' : 'unauthenticated',
     user: null,
     error: null,
+    isAuthenticating: false,
   })
 
   React.useEffect(() => {
@@ -30,10 +33,10 @@ function AuthProvider({ service, children }: AuthProviderProps) {
     let active = true
     void service.me().then(
       (user) => {
-        if (active) setState({ status: 'authenticated', user, error: null })
+        if (active) setState({ status: 'authenticated', user, error: null, isAuthenticating: false })
       },
       (error: unknown) => {
-        if (active) setState({ status: 'unauthenticated', user: null, error: getErrorMessage(error) })
+        if (active) setState({ status: 'unauthenticated', user: null, error: getErrorMessage(error), isAuthenticating: false })
       },
     )
 
@@ -43,12 +46,23 @@ function AuthProvider({ service, children }: AuthProviderProps) {
   }, [service])
 
   async function login(credentials: LoginCredentials) {
-    setState({ status: 'loading', user: null, error: null })
+    setState((current) => ({ ...current, isAuthenticating: true, error: null }))
     try {
       const session = await service.login(credentials)
-      setState({ status: 'authenticated', user: session.user, error: null })
+      setState({ status: 'authenticated', user: session.user, error: null, isAuthenticating: false })
     } catch (error) {
-      setState({ status: 'unauthenticated', user: null, error: getErrorMessage(error) })
+      setState({ status: 'unauthenticated', user: null, error: getErrorMessage(error), isAuthenticating: false })
+      throw error
+    }
+  }
+
+  async function setPassword(token: string, password: string) {
+    setState((current) => ({ ...current, isAuthenticating: true, error: null }))
+    try {
+      const session = await service.setPassword(token, password)
+      setState({ status: 'authenticated', user: session.user, error: null, isAuthenticating: false })
+    } catch (error) {
+      setState((current) => ({ ...current, isAuthenticating: false, error: getErrorMessage(error) }))
       throw error
     }
   }
@@ -67,14 +81,25 @@ function AuthProvider({ service, children }: AuthProviderProps) {
     setState((current) => ({ ...current, status: 'loading', error: null }))
     try {
       await service.logout()
-      setState({ status: 'unauthenticated', user: null, error: null })
+      setState({ status: 'unauthenticated', user: null, error: null, isAuthenticating: false })
     } catch (error) {
       setState((current) => ({ ...current, status: 'authenticated', error: getErrorMessage(error) }))
       throw error
     }
   }
 
-  const value: AuthContextValue = { ...state, login, forgotPassword, logout }
+  async function logoutAll() {
+    setState((current) => ({ ...current, status: 'loading', error: null }))
+    try {
+      await service.logoutAll()
+      setState({ status: 'unauthenticated', user: null, error: null, isAuthenticating: false })
+    } catch (error) {
+      setState((current) => ({ ...current, status: 'authenticated', error: getErrorMessage(error) }))
+      throw error
+    }
+  }
+
+  const value: AuthContextValue = { ...state, login, setPassword, forgotPassword, logout, logoutAll }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
